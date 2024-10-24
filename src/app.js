@@ -16,10 +16,4 @@ app.use(cookieParser());
 app.use(express.static("public"));
 
 
-
-//routes import 
-
-
-
-
 export { app }
