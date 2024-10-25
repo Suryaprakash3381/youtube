@@ -6,5 +6,8 @@ const router = express.Router();
 
 router.route("/resister").post(resisterUser);
 
-
+router.route("/name").get((req, res) => {
+    res.send("hello world")
+    console.log("hello world")
+})
 export default router;
