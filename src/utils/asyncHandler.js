@@ -1,17 +1,17 @@
 // method 1
 
-const asyncHandler = (fn) =>  async (req , res , next) => {
-    try {
-        await fn(req, res,next )
-    } catch (error) {
-      res.status(err.code || 404).json({
-        success: false,
-        message: error.message || "Server Error"
-      })
-    }
-}
+// const asyncHandler = (fn) =>  async (req , res , next) => {
+//     try {
+//         await fn(req, res,next )
+//     } catch (error) {
+//       res.status(error.code || 404).json({
+//         success: false,
+//         message: error.message || "Server Error"
+//       })
+//     }
+// }
 
-export { asyncHandler } 
+// export { asyncHandler } 
 
 // metrhod 2
 // const asyncHandler = (requestHandler) => {
@@ -27,3 +27,16 @@ export { asyncHandler }
 // };
 
 // export { asyncHandler };
+const asyncHandler = fn => (req, res, next) => {
+  Promise.resolve(fn(req, res, next)).catch(error => {
+      console.error("Error:", error);
+      res.status(error.statusCode || 500).json({
+          success: false,
+          message: error.message || "Server Error",
+          data: error.data || null,
+      });
+  });
+};
+
+export { asyncHandler };
+
