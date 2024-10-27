@@ -76,7 +76,7 @@ const resisterUser = asyncHandler(async (req, res) => {
     // Send success response
     res.status(200).json(new ApiResponse(200, createdUser, "User registered successfully."));
   } catch (error) {
-    console.error("Error in resisterUser:", error);
+    throw new ApiResponse(error, "Something went wrong while registering the user")
     
   }
 });
