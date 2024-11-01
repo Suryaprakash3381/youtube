@@ -1,7 +1,8 @@
 // src/routes/user.routes.js
 import express from 'express';
-import { resisterUser } from '../controllers/user.controller.js';
+import { resisterUser , loginUser , logOutUser } from '../controllers/user.controller.js';
 import { upload } from "../middlewares/multer.middlewares.js";
+import {verifyJWT} from "../middlewares/auth.middlewares.js";
 
 const router = express.Router();
 
@@ -13,4 +14,9 @@ router.route("/resister").post(
     resisterUser
 );
 
+router.route("/login").post(loginUser)
+
+router.route("/logout").post(verifyJWT, logOutUser)
+
+   
 export default router;
