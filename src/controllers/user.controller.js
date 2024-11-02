@@ -99,62 +99,6 @@ const resisterUser = asyncHandler(async (req, res) => {
   }
 });
 
-const loginUser  = asyncHandler(async(req , res) => {
-try {
-  
-//   //bring data from req.body
-
-//   const {username, password , email , } = req.body
-
-//     //find the user based on the username or email
-
-//    if (!(username || email)) {
-//     throw new ApiError( 400 , "Username or email is required.");
-//   }
-
-//  const user = await User.findOne({
-//   $or: [{username} , {email}]
-//  })
-
-
-//  if (!user) {
-//   throw new ApiError (404 , "user dosenot exist")
-//  }
-  
-
-//   //check the password to login
-  
-//   const isPasswordValid = await user.isPasswordCorrect(password)
-
-//   if (!isPasswordValid) {
-//     throw new ApiError(401 , "invalid user credentials")
-//   }
-
-//   // access and refresh token
- 
-//    const {accessToken , refreshToken} = await generateAccessAndRefreshToken(user._id)
-
-//   // send cookies
-// const loggedin = await User.findOne(user._id).select("-password -refreshToken");
-
-// const options = {
-//   httpOnly : true,
-//   secure: true
-// }
-
-// return res.status (200)
-// .cookie("accessToken", accessToken , options)
-// .cookie("refreshToken",refreshToken, options)
-// .json(
-//   new ApiResponse(200,
-//     {
-//       user: loggedin,
-//       accessToken,
-//       refreshToken
-//     },loggedin, "User logged in successfully.")
- 
-// )
-
 const loginUser = asyncHandler(async (req, res) => {
   try {
     // Bring data from req.body
@@ -179,59 +123,78 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 
     // Access and refresh token
-    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
+    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
+      user._id,
+    );
 
     // Send cookies
-    const loggedin = await User.findById(user._id).select("-password -refreshToken");
+    const loggedin = await User.findById(user._id).select(
+      "-password -refreshToken",
+    );
     const options = {
       httpOnly: true,
       secure: true,
-      sameSite: "None" // Ensure cookies are set correctly, especially for cross-site contexts
+      sameSite: "None", // Ensure cookies are set correctly, especially for cross-site contexts
     };
+    console.log("User logged in successfully")
 
     return res
       .status(200)
       .cookie("accessToken", accessToken, options)
       .cookie("refreshToken", refreshToken, options)
-      .json(new ApiResponse(200, { user: loggedin, accessToken, refreshToken }, "User logged in successfully."));
+      .json(
+        new ApiResponse(
+          200,
+          { user: loggedin, accessToken, refreshToken },
+          "User logged in successfully.",
+        ),
+      );
+
+     
   } catch (error) {
     console.error("Login Error:", error);
-    res.status(500).json(new ApiResponse(500, null, "Login failed: " + (error.message || "Unknown error")));
+    res
+      .status(500)
+      .json(
+        new ApiResponse(
+          500,
+          null,
+          "Login failed: " + (error.message || "Unknown error"),
+        ),
+      );
   }
-});
-
-
-} catch (error) {
- console.log(error) 
-}
 });
 
 
 const logOutUser = asyncHandler(async(req , res) => {
-
+try {
+  
  await User.findByIdAndUpdate(
-    req.user._id,{
-      $set: {
-        refreshToken : undefined,
-      }
-
-    },
-    {
-      new :true
+  req.user._id,{
+    $set: {
+      refreshToken : undefined,
     }
-  )
 
-  const options = {
-    httpOnly : true,
-    secure: true
+  },
+  {
+    new :true
   }
+)
 
-  return res.status(200)
-    .clearCookie("accessToken" , options)
-    .clearCookie("refreshToken" , options)
-    .json(new ApiResponse(200,{},"User logged out successfully"))
- 
+const options = {
+  httpOnly : true,
+  secure: true
+}
 
+return res.status(200)
+  .clearCookie("accessToken" , options)
+  .clearCookie("refreshToken" , options)
+  .json(new ApiResponse(200,{},"User logged out successfully"))
+
+
+} catch (error) {
+  throw new ApiError( 401 , "Authentication failed");
+}
 })
 
 export { resisterUser , loginUser , logOutUser };
